@@ -14,7 +14,7 @@ ext_modules = [Extension('pulpcbc',
 
 setup(
     name = 'pulpcbc',
-    version = '0.1',
+    version = '0.1.2',
     cmdclass = {'build_ext': build_ext},
     ext_modules = ext_modules,
 )
