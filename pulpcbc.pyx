@@ -1,4 +1,5 @@
 from libc.stdlib cimport malloc, free
+from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from cython.operator import dereference
 from cpython.ref cimport PyObject
 from libcpp cimport bool
@@ -214,7 +215,7 @@ cdef class CBC:
         cdef double *objectCoeffs = <double *>malloc(sizeof(double) * numVars)
         for i from 0 <= i < numVars:
             objectCoeffs[i] = 0
-        for v,val in lp.objective.iteritems():
+        for v,val in lp.objective.items():
             objectCoeffs[self.v2n[v]]=val
 
         # Solver
@@ -247,13 +248,14 @@ cdef class CBC:
             model.passInEventHandler(event_handler)
 
         # Set options
-        options = " ".join('-%s' % opt for opt in self.options)
-        options = options.split(" ")
+        options = b" ".join(b'-%s' % opt for opt in self.options)
+        options = options.split()
         cdef int argc = len(options) + 3
-        cdef char **argv = <char**>malloc(sizeof(char*) * argc)
+        cdef char **argv = <char**>PyMem_Malloc(sizeof(char*) * argc)
         argv[0] = "cbc"
         for i, option in enumerate(options):
-            argv[i+1] = options[i]
+            argv[i+1] = <char*> options[i]
+
         argv[argc-2] = "-solve"
         argv[argc-1] = "-quit"
 
@@ -262,7 +264,7 @@ cdef class CBC:
             CbcMain0(dereference(model))
             CbcMain1(argc, argv, dereference(model))
 
-        free(argv)
+        PyMem_Free(argv)
 
         lp.objValue = model.getObjValue()
         lp.bestBound = model.getBestPossibleObjValue()

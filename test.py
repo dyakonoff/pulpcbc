@@ -34,7 +34,7 @@ def test_callback():
     p += 3*x + y >= 8
     p += 1*x + 1.5*y <= 12
 
-    solver = pulpcbc.CBC()
+    solver = pulpcbc.CBC(options=['presolve more'])
 
     USED_CB = False
     def event_cb(eventWhere):
@@ -45,7 +45,7 @@ def test_callback():
         return pulpcbc.Action.noAction
 
     p.solve(solver, callback=event_cb)
-    print x.varValue, y.varValue
+    print(x.varValue, y.varValue)
 
     assert USED_CB is True
 
