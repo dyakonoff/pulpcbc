@@ -248,7 +248,7 @@ cdef class CBC:
             model.passInEventHandler(event_handler)
 
         # Set options
-        options = b" ".join(b'-%s' % opt for opt in self.options)
+        options = b" ".join(b'-' + opt for opt in self.options)
         options = options.split()
         cdef int argc = len(options) + 3
         cdef char **argv = <char**>PyMem_Malloc(sizeof(char*) * argc)
